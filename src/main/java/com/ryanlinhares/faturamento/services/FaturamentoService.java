@@ -1,7 +1,7 @@
 package com.ryanlinhares.faturamento.services;
 
 import java.io.File;
-import java.util.Arrays;
+import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -9,49 +9,51 @@ import javax.xml.bind.Unmarshaller;
 
 import org.springframework.stereotype.Service;
 
-import com.ryanlinhares.faturamento.model.Faturamentos.Faturamento;
+import com.ryanlinhares.faturamento.model.FaturamentoDia;
+import com.ryanlinhares.faturamento.model.Faturamentos;
 
 @Service
 public class FaturamentoService {
 
-    public Faturamento carregarFaturamento(String caminhoArquivo) {
-        try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(Faturamento.class);
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            return (Faturamento) unmarshaller.unmarshal(new File(caminhoArquivo));
-        } catch (JAXBException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+	public void processarFaturamento() {
+		try {
 
-    public void calcularFaturamento(Faturamento faturamento) {
-        double somaFaturamento = 0;
-        int diasComFaturamento = 0;
-        int menorFaturamento = Integer.MAX_VALUE;
-        int maiorFaturamento = Integer.MIN_VALUE;
+			JAXBContext jaxbContext = JAXBContext.newInstance(Faturamentos.class);
+			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
-        for (FaturamentoDia dia : faturamento.getFaturamentos()) {
-            int valor = dia.getValor();
-            if (valor > 0) {
-                somaFaturamento += valor;
-                diasComFaturamento++;
+			File xmlFile = new File("src/main/resources/faturamento.xml");
+			Faturamentos faturamentos = (Faturamentos) unmarshaller.unmarshal(xmlFile);
 
-                if (valor < menorFaturamento) {
-                    menorFaturamento = valor;
-                }
-                if (valor > maiorFaturamento) {
-                    maiorFaturamento = valor;
-                }
-            }
-        }
+			List<FaturamentoDia> listaFaturamentos = faturamentos.getFaturamentos();
 
-        double mediaMensal = (diasComFaturamento > 0) ? (somaFaturamento / diasComFaturamento) : 0;
-        int diasAcimaMedia = (int) Arrays.stream(faturamento.getFaturamentos())
-                .filter(dia -> dia.getValor() > mediaMensal).count();
+			double menorValor = Double.MAX_VALUE;
+			double maiorValor = Double.MIN_VALUE;
+			double soma = 0;
+			int diasComFaturamento = 0;
 
-        System.out.println("Menor valor de faturamento: " + (menorFaturamento == Integer.MAX_VALUE ? "Nenhum" : menorFaturamento));
-        System.out.println("Maior valor de faturamento: " + (maiorFaturamento == Integer.MIN_VALUE ? "Nenhum" : maiorFaturamento));
-        System.out.println("Número de dias com faturamento acima da média: " + diasAcimaMedia);
-    }
+			for (FaturamentoDia dia : listaFaturamentos) {
+				double valor = dia.getValor();
+				if (valor > 0) {
+					soma += valor;
+					diasComFaturamento++;
+
+					if (valor < menorValor) {
+						menorValor = valor;
+					}
+
+					if (valor > maiorValor) {
+						maiorValor = valor;
+					}
+				}
+			}
+
+			double media = soma / diasComFaturamento;
+			System.out.println("Menor valor: " + menorValor);
+			System.out.println("Maior valor: " + maiorValor);
+			System.out.println("Média mensal: " + media);
+
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		}
+	}
 }

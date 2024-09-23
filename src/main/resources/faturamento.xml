@@ -1,0 +1,11 @@
+<faturamentos>
+    <faturamento dia="2024-09-01">150</faturamento>
+    <faturamento dia="2024-09-02">0</faturamento>
+    <faturamento dia="2024-09-03">200</faturamento>
+    <faturamento dia="2024-09-04">0</faturamento>
+    <faturamento dia="2024-09-05">300</faturamento>
+    <faturamento dia="2024-09-06">250</faturamento>
+    <faturamento dia="2024-09-07">0</faturamento>
+    <faturamento dia="2024-09-08">0</faturamento>
+    <faturamento dia="2024-09-09">350</faturamento>
+</faturamentos>
